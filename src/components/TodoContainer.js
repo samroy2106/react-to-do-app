@@ -2,13 +2,14 @@ import React from "react"
 import TodosList from "./TodosList";
 import Header from "./Header"
 import InputTodo from "./InputTodo"
-import {v4 as uuidv4} from "uuid"
+//import {v4 as uuidv4} from "uuid"
 import axios from "axios"
 
 class TodoContainer extends React.Component {
 
   state = {
-    todos: []
+    todos: [],
+    show: false
   };
 
   handleChange = id => {
@@ -18,18 +19,22 @@ class TodoContainer extends React.Component {
           todo.completed = !todo.completed;
         }
         return todo;
-      })
+      }),
+      show: !this.state.show,
     }));
   };
 
   delTodo = id => {
-    this.setState({
-      todos: [
-        ...this.state.todos.filter(todo => {
-          return todo.id !== id;
-        })
-      ]
-    });
+    axios.delete(`https://jsonplaceholder.typicode.com/todos/${id}`)
+    .then(response =>
+      this.setState({
+        todos: [
+          ...this.state.todos.filter(todo => {
+            return todo.id !== id
+          }),
+        ],
+      })
+    )
   };
 
   addTodoItem = title => {
@@ -52,7 +57,7 @@ class TodoContainer extends React.Component {
   render() {
     return (
       <div className="container">
-        <Header />
+        <Header headerSpan={this.state.show} />
         <InputTodo addTodoProps={this.addTodoItem}/>
         <TodosList
           todos={this.state.todos}
